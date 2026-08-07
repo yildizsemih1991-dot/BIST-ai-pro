@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>BIST AI PRO</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#06111f;
+ color:#eef5ff;
+ font-family:Arial,Helvetica,sans-serif;
+}
+header{
+ padding:22px 18px;
+ background:linear-gradient(135deg,#071a31,#0d2b4c);
+ border-bottom:1px solid #203b5c;
+}
+header h1{
+ margin:0;
+ font-size:28px;
+}
+header p{
+ margin:7px 0 0;
+ color:#8fa8c4;
+}
+.container{
+ max-width:900px;
+ margin:auto;
+ padding:16px;
+}
+.card{
+ background:#0b1b2d;
+ border:1px solid #1d3857;
+ border-radius:20px;
+ padding:18px;
+ margin-bottom:15px;
+ box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+.search{
+ display:flex;
+ gap:10px;
+}
+input{
+ flex:1;
+ min-width:0;
+ padding:17px;
+ border-radius:15px;
+ border:1px solid #294563;
+ background:#061321;
+ color:white;
+ font-size:20px;
+ outline:none;
+}
+button{
+ border:0;
+ border-radius:15px;
+ padding:15px 20px;
+ font-weight:bold;
+ font-size:17px;
+ background:#1677ff;
+ color:white;
+}
+button:active{transform:scale(.97)}
+button.green{background:#099b5b}
+button.gray{background:#233a54}
+.status{
+ margin-top:12px;
+ padding:13px;
+ border-radius:12px;
+ background:#102941;
+ color:#a9bdd3;
+}
+.error{
+ background:#3b1520;
+ color:#ff9eac;
+}
+.loading{
+ color:#ffd76b;
+}
+.hero{
+ text-align:center;
+ padding:25px 15px;
+}
+.symbol{
+ font-size:32px;
+ font-weight:bold;
+}
+.price{
+ font-size:45px;
+ font-weight:800;
+ margin:10px 0;
+}
+.change{
+ font-size:19px;
+}
+.up{color:#19d77a}
+.down{color:#ff5969}
+.score{
+ font-size:68px;
+ font-weight:900;
+ margin:5px 0;
+}
+.scoreLabel{
+ font-size:24px;
+ font-weight:bold;
+}
+.regime{
+ color:#9bb0c8;
+ margin-top:8px;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:10px;
+}
+.metric{
+ background:#071625;
+ border:1px solid #1c3652;
+ border-radius:14px;
+ padding:14px;
+}
+.metric small{
+ color:#8099b4;
+ display:block;
+ margin-bottom:7px;
+}
+.metric strong{
+ font-size:20px;
+}
+.sectionTitle{
+ font-size:23px;
+ font-weight:bold;
+ margin:4px 0 15px;
+}
+.bar{
+ height:10px;
+ background:#132a42;
+ border-radius:10px;
+ overflow:hidden;
+ margin-top:8px;
+}
+.bar i{
+ display:block;
+ height:100%;
+ width:0;
+ background:#20d57a;
+}
+.signal{
+ text-align:center;
+ font-size:30px;
+ font-weight:900;
+ padding:15px;
+ border-radius:15px;
+ background:#092a21;
+ color:#20df87;
+}
+.signal.sell{
+ background:#34141c;
+ color:#ff6575;
+}
+.signal.hold{
+ background:#332b10;
+ color:#ffd35b;
+}
+.comment{
+ line-height:1.65;
+ color:#c4d4e5;
+}
+.comment b{color:white}
+table{
+ width:100%;
+ border-collapse:collapse;
+}
+td{
+ padding:10px 5px;
+ border-bottom:1px solid #1a3049;
+}
+td:last-child{
+ text-align:right;
+ font-weight:bold;
+}
+canvas{
+ width:100%;
+ height:260px;
+ background:#071625;
+ border-radius:15px;
+}
+.formations{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+}
+.badge{
+ padding:9px 12px;
+ border-radius:20px;
+ background:#14304b;
+ color:#a9d0ff;
+}
+.badge.good{
+ background:#0c3828;
+ color:#44e39a;
+}
+.badge.warn{
+ background:#44320c;
+ color:#ffd76b;
+}
+.scan{
+ display:grid;
+ gap:8px;
+}
+.stock{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:13px;
+ border-radius:13px;
+ background:#071625;
+ border:1px solid #1b3550;
+}
+.stock span{
+ color:#9db3cb;
+}
+.small{
+ font-size:12px;
+ color:#7890a8;
+ line-height:1.5;
+}
+footer{
+ text-align:center;
+ color:#627b95;
+ padding:25px;
+ font-size:12px;
+}
+@media(max-width:550px){
+ .search{flex-direction:column}
+ button{width:100%}
+ .grid{grid-template-columns:1fr 1fr}
+ .price{font-size:38px}
+ .score{font-size:58px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="container">
+<h1>🧠 BIST AI PRO</h1>
+<p>Dinamik teknik analiz • Risk yönetimi • Türkçe AI yorum</p>
+</div>
+</header>
+
+<div class="container">
+
+<div class="card">
+<div class="search">
+<input id="symbol" placeholder="Hisse kodu yazın  Örn: THYAO" autocomplete="off">
+<button onclick="analyze()">🔎 ARA</button>
+</div>
+<div id="status" class="status">
+Hisse kodunu girin. Örn: ASELS, THYAO, EREGL, YEOTK
+</div>
+</div>
+
+<div id="result">
+
+<div class="card hero">
+<div class="symbol">--</div>
+<div class="price">--</div>
+<div class="change">Veri bekleniyor</div>
+</div>
+
+<div class="card">
+<div class="signal hold">VERİ BEKLENİYOR</div>
+</div>
+
+</div>
+
+<footer>
+BIST AI PRO • Teknik analiz yatırım tavsiyesi değildir.
+</footer>
+
+</div>
+
+<script>
+
+/* =========================================================
+   BIST AI PRO
+   TEK DOSYA SÜRÜMÜ
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+let DATA = [];
+let CURRENT = null;
+
+/* ---------------------------------------------------------
+   YARDIMCI
+--------------------------------------------------------- */
+
+function fmt(x,d=2){
+ if(x===null || x===undefined || !isFinite(x)) return "--";
+ return Number(x).toLocaleString("tr-TR",{
+   minimumFractionDigits:d,
+   maximumFractionDigits:d
+ });
+}
+
+function avg(a){
+ if(!a.length)return null;
+ return a.reduce((x,y)=>x+y,0)/a.length;
+}
+
+function ema(values,period){
+ if(values.length<period)return null;
+ let k=2/(period+1);
+ let e=avg(values.slice(0,period));
+ for(let i=period;i<values.length;i++){
+   e=values[i]*k+e*(1-k);
+ }
+ return e;
+}
+
+function sma(values,period){
+ if(values.length<period)return null;
+ return avg(values.slice(-period));
+}
+
+function stdev(values){
+ if(!values.length)return 0;
+ let m=avg(values);
+ return Math.sqrt(avg(values.map(x=>(x-m)**2)));
+}
+
+function rsi(values,period=14){
+ if(values.length<period+1)return null;
+
+ let gains=0;
+ let losses=0;
+
+ for(let i=values.length-period;i<values.length;i++){
+   let d=values[i]-values[i-1];
+   if(d>0) gains+=d;
+   else losses+=Math.abs(d);
+ }
+
+ let ag=gains/period;
+ let al=losses/period;
+
+ if(al===0)return 100;
+
+ return 100-(100/(1+ag/al));
+}
+
+function macd(values){
+ if(values.length<35)return {macd:null,signal:null,hist:null};
+
+ let fast=ema(values,12);
+ let slow=ema(values,26);
+
+ if(fast===null||slow===null)
+   return {macd:null,signal:null,hist:null};
+
+ let arr=[];
+
+ for(let i=26;i<values.length;i++){
+   let a=ema(values.slice(0,i+1),12);
+   let b=ema(values.slice(0,i+1),26);
+   if(a!==null&&b!==null) arr.push(a-b);
+ }
+
+ let line=fast-slow;
+ let signal=ema(arr,9);
+
+ return {
+   macd:line,
+   signal:signal,
+   hist:signal===null?null:line-signal
+ };
+}
+
+function bollinger(values,period=20,mult=2){
+ if(values.length<period)return null;
+
+ let s=values.slice(-period);
+ let mid=avg(s);
+ let sd=stdev(s);
+
+ return {
+   mid:mid,
+   upper:mid+mult*sd,
+   lower:mid-mult*sd,
+   width:(2*mult*sd)/mid*100
+ };
+}
+
+function atr(high,low,close,period=14){
+ if(close.length<period+1)return null;
+
+ let tr=[];
+
+ for(let i=1;i<close.length;i++){
+   tr.push(Math.max(
+     high[i]-low[i],
+     Math.abs(high[i]-close[i-1]),
+     Math.abs(low[i]-close[i-1])
+   ));
+ }
+
+ return avg(tr.slice(-period));
+}
+
+function stochastic(high,low,close,period=14){
+ if(close.length<period)return null;
+
+ let h=Math.max(...high.slice(-period));
+ let l=Math.min(...low.slice(-period));
+
+ if(h===l)return 50;
+
+ return ((close[close.length-1]-l)/(h-l))*100;
+}
+
+/* ---------------------------------------------------------
+   YAHOO CHART API
+--------------------------------------------------------- */
+
+async function yahoo(symbol){
+
+ const url=
+ "https://query1.finance.yahoo.com/v8/finance/chart/"
+ +encodeURIComponent(symbol+".IS")
+ +"?range=1y&interval=1d&events=history";
+
+ const response=await fetch(url,{
+   method:"GET",
+   cache:"no-store"
+ });
+
+ if(!response.ok){
+   throw new Error("Yahoo Finance HTTP "+response.status);
+ }
+
+ const json=await response.json();
+
+ if(!json.chart ||
+    !json.chart.result ||
+    !json.chart.result[0]){
+   throw new Error("Hisse bulunamadı");
+ }
+
+ const r=json.chart.result[0];
+
+ const q=r.indicators.quote[0];
+
+ let rows=[];
+
+ for(let i=0;i<r.timestamp.length;i++){
+
+   if(
+     q.close[i]!==null &&
+     q.high[i]!==null &&
+     q.low[i]!==null
+   ){
+
+     rows.push({
+       time:new Date(r.timestamp[i]*1000),
+       open:q.open[i],
+       high:q.high[i],
+       low:q.low[i],
+       close:q.close[i],
+       volume:q.volume[i]||0
+     });
+
+   }
+ }
+
+ if(rows.length<50){
+   throw new Error("Yeterli fiyat geçmişi alınamadı");
+ }
+
+ return rows;
+}
+
+/* ---------------------------------------------------------
+   ANALİZ
+--------------------------------------------------------- */
+
+function calculate(rows){
+
+ const c=rows.map(x=>x.close);
+ const h=rows.map(x=>x.high);
+ const l=rows.map(x=>x.low);
+ const v=rows.map(x=>x.volume);
+
+ const price=c.at(-1);
+
+ const e20=ema(c,20);
+ const e50=ema(c,50);
+ const e200=ema(c,200);
+
+ const R=rsi(c);
+ const M=macd(c);
+ const B=bollinger(c);
+ const A=atr(h,l,c);
+ const S=stochastic(h,l,c);
+
+ const vol20=sma(v,20);
+ const volRatio=vol20 ? v.at(-1)/vol20 : null;
+
+ let support=Math.min(...l.slice(-30));
+ let resistance=Math.max(...h.slice(-30));
+
+ /* TREND */
+
+ let trendScore=0;
+
+ if(e20 && price>e20)trendScore+=8;
+ if(e50 && price>e50)trendScore+=8;
+ if(e200 && price>e200)trendScore+=8;
+
+ if(e20&&e50&&e20>e50)trendScore+=5;
+ if(e50&&e200&&e50>e200)trendScore+=6;
+
+ /* RSI */
+
+ let rsiScore=0;
+
+ if(R!==null){
+   if(R>=50 && R<=70)rsiScore=10;
+   else if(R>70)rsiScore=3;
+   else if(R>=40)rsiScore=6;
+   else rsiScore=2;
+ }
+
+ /* MACD */
+
+ let macdScore=0;
+
+ if(M.macd!==null && M.signal!==null){
+   if(M.macd>M.signal)macdScore=10;
+   else macdScore=2;
+
+   if(M.hist>0)macdScore+=2;
+ }
+
+ /* BOLLINGER */
+
+ let bollScore=0;
+
+ if(B){
+   if(price>B.mid && price<B.upper)bollScore=7;
+   else if(price<B.lower)bollScore=10;
+   else if(price>B.upper)bollScore=2;
+   else bollScore=5;
+ }
+
+ /* STOCH */
+
+ let stochScore=0;
+
+ if(S!==null){
+   if(S>20&&S<80)stochScore=6;
+   else if(S<20)stochScore=8;
+   else stochScore=2;
+ }
+
+ /* HACİM */
+
+ let volumeScore=0;
+
+ if(volRatio!==null){
+   if(volRatio>=1.5)volumeScore=8;
+   else if(volRatio>=1)volumeScore=5;
+   else volumeScore=2;
+ }
+
+ let technical=
+   trendScore+
+   rsiScore+
+   macdScore+
+   bollScore+
+   stochScore+
+   volumeScore;
+
+ technical=Math.min(100,technical);
+
+ /* PİYASA REJİMİ */
+
+ let regime="YATAY";
+
+ if(e20&&e50&&e200){
+
+   if(price>e20 && e20>e50 && e50>e200)
+      regime="GÜÇLÜ YÜKSELİŞ";
+
+   else if(price>e200 && e20>e50)
+      regime="YÜKSELİŞ";
+
+   else if(price<e20 && e20<e50 && e50<e200)
+      regime="GÜÇLÜ DÜŞÜŞ";
+
+   else if(price<e200)
+      regime="DÜŞÜŞ";
+
+ }
+
+ /* DİNAMİK STOP */
+
+ let stop;
+
+ if(A){
+   stop=price-(A*2);
+ }else{
+   stop=price*0.94;
+ }
+
+ /* hedef */
+
+ let risk=price-stop;
+
+ let target1=price+risk*1.5;
+ let target2=price+risk*3;
+
+ /* destek/direnç iyileştirme */
+
+ if(resistance>price && resistance<target1*1.15){
+   target1=resistance;
+ }
+
+ /* TOPLAM SKOR */
+
+ let score=
+   technical*0.70+
+   volumeScore*0.10+
+   (price>support?10:3)+
+   (price<resistance?10:3);
+
+ score=Math.round(Math.max(0,Math.min(100,score)));
+
+ let action;
+
+ if(score>=80)action="GÜÇLÜ AL";
+ else if(score>=65)action="AL";
+ else if(score>=48)action="TUT";
+ else if(score>=32)action="ZAYIF";
+ else action="SAT";
+
+ return {
+   price,
+   e20,
+   e50,
+   e200,
+   rsi:R,
+   macd:M.macd,
+   signal:M.signal,
+   hist:M.hist,
+   boll:B,
+   atr:A,
+   stochastic:S,
+   volume:v.at(-1),
+   vol20,
+   volRatio,
+   support,
+   resistance,
+   trendScore,
+   technical,
+   score,
+   action,
+   regime,
+   stop,
+   target1,
+   target2,
+   risk
+ };
+}
+
+/* ---------------------------------------------------------
+   FORMASYON
+--------------------------------------------------------- */
+
+function formations(rows,A){
+
+ const c=rows.map(x=>x.close);
+ const last=c.at(-1);
+
+ let f=[];
+
+ if(A.e50&&A.e200&&A.e50>A.e200)
+   f.push(["Golden Cross","good"]);
+
+ if(A.e50&&A.e200&&A.e50<A.e200)
+   f.push(["Death Cross","warn"]);
+
+ if(A.rsi!==null && A.rsi<30)
+   f.push(["RSI aşırı satım","good"]);
+
+ if(A.rsi!==null && A.rsi>70)
+   f.push(["RSI aşırı alım","warn"]);
+
+ if(A.boll && A.boll.width<8)
+   f.push(["Bollinger sıkışması","good"]);
+
+ if(A.volRatio && A.volRatio>1.8)
+   f.push(["Hacim patlaması","good"]);
+
+ if(A.macd>A.signal)
+   f.push(["MACD pozitif","good"]);
+ else
+   f.push(["MACD negatif","warn"]);
+
+ if(last>A.resistance)
+   f.push(["Direnç kırılımı","good"]);
+
+ if(last<A.support)
+   f.push(["Destek kırılımı","warn"]);
+
+ if(!f.length)
+   f.push(["Belirgin formasyon yok",""]);
+
+ return f;
+}
+
+/* ---------------------------------------------------------
+   AI TÜRKÇE YORUM
+--------------------------------------------------------- */
+
+function makeComment(A,symbol){
+
+ let text="";
+
+ if(A.regime==="GÜÇLÜ YÜKSELİŞ"){
+   text+=`<b>${symbol}</b> güçlü yükseliş rejiminde görünüyor. `;
+ }else if(A.regime==="YÜKSELİŞ"){
+   text+=`<b>${symbol}</b> yükseliş eğiliminde. `;
+ }else if(A.regime==="DÜŞÜŞ"||A.regime==="GÜÇLÜ DÜŞÜŞ"){
+   text+=`<b>${symbol}</b> düşüş baskısı altında. `;
+ }else{
+   text+=`<b>${symbol}</b> yatay/geçiş rejiminde. `;
+ }
+
+ if(A.price>A.e200)
+   text+="Fiyat 200 günlük EMA üzerinde. ";
+ else
+   text+="Fiyat 200 günlük EMA altında. ";
+
+ if(A.rsi!==null){
+
+   if(A.rsi<30)
+      text+="RSI aşırı satım bölgesinde ve tepki potansiyeli bulunuyor. ";
+
+   else if(A.rsi>70)
+      text+="RSI aşırı alım bölgesinde; kısa vadede kâr realizasyonu riski artmış durumda. ";
+
+   else if(A.rsi>50)
+      text+="RSI 50 üzerinde ve momentum pozitif. ";
+
+   else
+      text+="RSI 50 altında ve momentum zayıf. ";
+ }
+
+ if(A.macd>A.signal)
+   text+="MACD pozitif tarafta. ";
+ else
+   text+="MACD negatif tarafta. ";
+
+ if(A.volRatio>=1.5)
+   text+="Son işlem hacmi 20 günlük ortalamanın belirgin şekilde üzerinde. ";
+
+ if(A.boll){
+
+   if(A.boll.width<8)
+     text+="Bollinger bantları sıkışmış; volatilite artışı için takip edilmeli. ";
+
+   if(A.price>A.boll.upper)
+     text+="Fiyat üst Bollinger bandının üzerinde; hareket aşırı ısınmış olabilir. ";
+
+ }
+
+ text+=`Dinamik stop yaklaşık <b>${fmt(A.stop)}</b> TL, `;
+ text+=`ilk hedef <b>${fmt(A.target1)}</b> TL, `;
+ text+=`ikinci hedef <b>${fmt(A.target2)}</b> TL. `;
+
+ return text;
+}
+
+/* ---------------------------------------------------------
+   GRAFİK
+--------------------------------------------------------- */
+
+function drawChart(rows,A){
+
+ const canvas=$("chart");
+
+ if(!canvas)return;
+
+ const ctx=canvas.getContext("2d");
+
+ const dpr=window.devicePixelRatio||1;
+ const W=canvas.clientWidth;
+ const H=260;
+
+ canvas.width=W*dpr;
+ canvas.height=H*dpr;
+
+ ctx.scale(dpr,dpr);
+
+ ctx.clearRect(0,0,W,H);
+
+ const data=rows.slice(-80);
+
+ let min=Math.min(...data.map(x=>x.close));
+ let max=Math.max(...data.map(x=>x.close));
+
+ min*=.98;
+ max*=1.02;
+
+ function x(i){
+   return i/(data.length-1)*W;
+ }
+
+ function y(p){
+   return H-((p-min)/(max-min))*H;
+ }
+
+ ctx.beginPath();
+
+ data.forEach((r,i)=>{
+   let xx=x(i);
+   let yy=y(r.close);
+
+   if(i===0)ctx.moveTo(xx,yy);
+   else ctx.lineTo(xx,yy);
+ });
+
+ ctx.lineWidth=2;
+ ctx.strokeStyle="#26d98a";
+ ctx.stroke();
+
+ /* EMA 20 */
+
+ const closes=data.map(x=>x.close);
+
+ ctx.beginPath();
+
+ closes.forEach((_,i)=>{
+   const slice=rows.slice(0,rows.length-80+i+1)
+                   .map(x=>x.close);
+
+   const e=ema(slice,20);
+
+   if(e!==null){
+
+     let xx=x(i);
+     let yy=y(e);
+
+     if(i===0)ctx.moveTo(xx,yy);
+     else ctx.lineTo(xx,yy);
+
+   }
+ });
+
+ ctx.lineWidth=1.5;
+ ctx.strokeStyle="#4ca3ff";
+ ctx.stroke();
+
+ /* destek */
+
+ ctx.setLineDash([6,6]);
+ ctx.beginPath();
+ ctx.moveTo(0,y(A.support));
+ ctx.lineTo(W,y(A.support));
+ ctx.strokeStyle="#ff6372";
+ ctx.stroke();
+
+ /* direnç */
+
+ ctx.beginPath();
+ ctx.moveTo(0,y(A.resistance));
+ ctx.lineTo(W,y(A.resistance));
+ ctx.strokeStyle="#ffd35b";
+ ctx.stroke();
+
+ ctx.setLineDash([]);
+
+}
+
+/* ---------------------------------------------------------
+   HTML SONUÇ
+--------------------------------------------------------- */
+
+function render(rows,A,symbol){
+
+ const form=formations(rows,A);
+
+ let signalClass="";
+
+ if(A.action.includes("SAT"))
+   signalClass="sell";
+
+ else if(A.action==="TUT"||A.action==="ZAYIF")
+   signalClass="hold";
+
+ let riskReward=
+   A.risk>0
+   ? ((A.target1-A.price)/A.risk)
+   : 0;
+
+ $("result").innerHTML=`
+
+ <div class="card hero">
+
+   <div class="symbol">${symbol}</div>
+
+   <div class="price">${fmt(A.price)} TL</div>
+
+   <div class="change">
+     Son kapanış • ${rows.at(-1).time.toLocaleDateString("tr-TR")}
+   </div>
+
+   <div class="score">${A.score}/100</div>
+
+   <div class="scoreLabel">${A.action}</div>
+
+   <div class="regime">
+     Piyasa/hisse rejimi: ${A.regime}
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="signal ${signalClass}">
+     ${A.action}
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">📊 Fiyat Grafiği</div>
+
+   <canvas id="chart"></canvas>
+
+   <div class="small">
+     Yeşil: fiyat • Mavi: EMA20 • Kırmızı: destek • Sarı: direnç
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">🎯 Risk Yönetimi</div>
+
+   <div class="grid">
+
+     <div class="metric">
+       <small>Güncel Fiyat</small>
+       <strong>${fmt(A.price)} TL</strong>
+     </div>
+
+     <div class="metric">
+       <small>ATR(14)</small>
+       <strong>${fmt(A.atr)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Dinamik Stop</small>
+       <strong>${fmt(A.stop)} TL</strong>
+     </div>
+
+     <div class="metric">
+       <small>Hedef 1</small>
+       <strong>${fmt(A.target1)} TL</strong>
+     </div>
+
+     <div class="metric">
+       <small>Hedef 2</small>
+       <strong>${fmt(A.target2)} TL</strong>
+     </div>
+
+     <div class="metric">
+       <small>Risk / Ödül</small>
+       <strong>1 : ${fmt(riskReward,2)}</strong>
+     </div>
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">📈 Teknik Analiz</div>
+
+   <div class="grid">
+
+     <div class="metric">
+       <small>EMA 20</small>
+       <strong>${fmt(A.e20)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>EMA 50</small>
+       <strong>${fmt(A.e50)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>EMA 200</small>
+       <strong>${fmt(A.e200)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>RSI 14</small>
+       <strong>${fmt(A.rsi)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>MACD</small>
+       <strong>${fmt(A.macd)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>MACD Signal</small>
+       <strong>${fmt(A.signal)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Stochastic</small>
+       <strong>${fmt(A.stochastic)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>ATR</small>
+       <strong>${fmt(A.atr)}</strong>
+     </div>
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">🟦 Bollinger Bands</div>
+
+   <div class="grid">
+
+     <div class="metric">
+       <small>Üst Bant</small>
+       <strong>${fmt(A.boll?.upper)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Orta Bant</small>
+       <strong>${fmt(A.boll?.mid)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Alt Bant</small>
+       <strong>${fmt(A.boll?.lower)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Bant Genişliği</small>
+       <strong>%${fmt(A.boll?.width)}</strong>
+     </div>
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">📊 Hacim Analizi</div>
+
+   <div class="grid">
+
+     <div class="metric">
+       <small>Son Hacim</small>
+       <strong>${fmt(A.volume,0)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>20 Gün Ort.</small>
+       <strong>${fmt(A.vol20,0)}</strong>
+     </div>
+
+     <div class="metric">
+       <small>Hacim Oranı</small>
+       <strong>${fmt(A.volRatio,2)}x</strong>
+     </div>
+
+     <div class="metric">
+       <small>Hacim Sinyali</small>
+       <strong>
+       ${A.volRatio>=1.5?"PATLAMA":"NORMAL"}
+       </strong>
+     </div>
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">🎯 Destek / Direnç</div>
+
+   <div class="grid">
+
+     <div class="metric">
+       <small>Destek</small>
+       <strong>${fmt(A.support)} TL</strong>
+     </div>
+
+     <div class="metric">
+       <small>Direnç</small>
+       <strong>${fmt(A.resistance)} TL</strong>
+     </div>
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">🔥 Formasyon / Sinyaller</div>
+
+   <div class="formations">
+
+     ${form.map(x=>`
+       <div class="badge ${x[1]}">${x[0]}</div>
+     `).join("")}
+
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">🧠 AI Türkçe Yorum</div>
+
+   <div class="comment">
+     ${makeComment(A,symbol)}
+   </div>
+
+ </div>
+
+ <div class="card">
+
+   <div class="sectionTitle">📚 Temel Analiz</div>
+
+   <div class="comment">
+
+     <p>
+     Bu tek dosyalık sürümde fiyat geçmişi Yahoo Finance
+     Chart API üzerinden alınmaktadır.
+     </p>
+
+     <p>
+     <b>F/K, PD/DD, FD/FAVÖK, ROE, borç/FAVÖK ve satış
+     büyümesi</b> gibi temel veriler için ayrıca güvenilir
+     finansal veri kaynağı gerekir.
+     </p>
+
+     <p>
+     Bu nedenle sistem temel verileri uydurmaz.
+     Veri kaynağı eklenmeden bu alanları yatırım kararında
+     gerçek veri gibi kullanma.
+     </p>
+
+   </div>
+
+ </div>
+
+ `;
+
+ drawChart(rows,A);
+
+}
+
+/* ---------------------------------------------------------
+   ANA ANALİZ
+--------------------------------------------------------- */
+
+async function analyze(){
+
+ let symbol=$("symbol").value
+   .trim()
+   .toUpperCase()
+   .replace(/[^A-Z0-9]/g,"");
+
+ if(!symbol){
+
+   $("status").className="status error";
+   $("status").innerHTML=
+     "⚠️ Önce bir BIST hisse kodu girin. Örn: THYAO";
+
+   return;
+ }
+
+ $("status").className="status loading";
+ $("status").innerHTML=
+   "⏳ "+symbol+" verisi alınıyor...";
+
+ $("result").innerHTML=`
+
+ <div class="card hero">
+   <div class="symbol">${symbol}</div>
+   <div class="price">⏳</div>
+   <div class="change">Veri yükleniyor...</div>
+ </div>
+
+ `;
+
+ try{
+
+   const rows=await yahoo(symbol);
+
+   const A=calculate(rows);
+
+   CURRENT=A;
+   DATA=rows;
+
+   render(rows,A,symbol);
+
+   $("status").className="status";
+   $("status").innerHTML=
+     "✅ "+symbol+" için "+rows.length+
+     " günlük fiyat verisi alındı.";
+
+ }catch(err){
+
+   console.error(err);
+
+   $("status").className="status error";
+
+   $("status").innerHTML=`
+   🔴 <b>VERİ ALINAMADI</b><br><br>
+   ${err.message}<br><br>
+   <span class="small">
+   GitHub Pages üzerinden açtığınızdan emin olun.
+   Dosyayı telefonda content:// adresinden açarsanız
+   tarayıcı dış API isteğini engelleyebilir.
+   </span>
+   `;
+
+   $("result").innerHTML=`
+
+   <div class="card hero">
+
+     <div class="symbol">${symbol}</div>
+
+     <div class="price">--</div>
+
+     <div class="change">
+       Veri alınamadı
+     </div>
+
+   </div>
+
+   `;
+
+ }
+
+}
+
+/* ---------------------------------------------------------
+   ENTER
+--------------------------------------------------------- */
+
+$("symbol").addEventListener("keydown",function(e){
+
+ if(e.key==="Enter"){
+   analyze();
+ }
+
+});
+
+/* ---------------------------------------------------------
+   OTOMATİK TEMİZ BAŞLANGIÇ
+--------------------------------------------------------- */
+
+$("symbol").value="";
+
+</script>
+
+</body>
+</html>
